@@ -16,35 +16,79 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        clean: true
       
+    - name: Clean workspace before build
+      run: |
+        echo "🧹 Cleaning workspace..."
+        rm -rf ~/.julia/compiled
+        rm -rf ~/.julia/logs
+        rm -rf *.json
+        rm -rf _work/_temp
+        find . -type f -name "*.json" -delete
+        echo "✅ Workspace cleaned"
+        
     - name: Setup Julia
       uses: julia-actions/setup-julia@v1
       with:
         version: '1.10'
         
-    - name: Cache Julia packages
+    - name: Clear Julia depot cache
+      run: |
+        echo "🧹 Clearing Julia depot..."
+        julia -e 'using Pkg; Pkg.gc()'
+        echo "✅ Julia depot cleared"
+        
+    - name: Cache Julia packages (fresh)
       uses: actions/cache@v3
       with:
         path: ~/.julia
-        key: ${{ runner.os }}-julia-${{ hashFiles('**/Project.toml') }}
+        key: ${{ runner.os }}-julia-v2-${{ hashFiles('**/Project.toml') }}-${{ github.run_id }}
         restore-keys: |
-          ${{ runner.os }}-julia-
+          ${{ runner.os }}-julia-v2-${{ hashFiles('**/Project.toml') }}
           
     - name: Install dependencies
       run: |
-        julia --project=. -e 'using Pkg; Pkg.instantiate()'
+        echo "📦 Installing dependencies..."
+        julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+        echo "✅ Dependencies installed"
+        
+    - name: Verify clean state
+      run: |
+        echo "🔍 Verifying clean state..."
+        ls -la
+        echo "No old JSON files:"
+        find . -name "*.json" -type f || echo "None found (good!)"
         
     - name: Run baseline scaling test
       run: |
+        echo "🚀 Starting baseline test..."
         julia --project=. github_safe_testbed.jl
+        echo "✅ Baseline test completed"
+        
+    - name: List generated files
+      if: always()
+      run: |
+        echo "📁 Generated files:"
+        ls -lh *.json 2>/dev/null || echo "No JSON files found"
         
     - name: Upload baseline results
       uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: baseline-results
+        name: baseline-results-${{ github.run_id }}
         path: scaling_results_*.json
         retention-days: 30
+        if-no-files-found: warn
+        
+    - name: Clean up after baseline
+      if: always()
+      run: |
+        echo "🧹 Cleaning up baseline test..."
+        rm -f scaling_results_*.json
+        julia -e 'GC.gc(true)'
+        echo "✅ Cleanup complete"
 
   holy-grail-test:
     name: Holy Grail Experiments
@@ -55,35 +99,79 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        clean: true
       
+    - name: Clean workspace before build
+      run: |
+        echo "🧹 Cleaning workspace..."
+        rm -rf ~/.julia/compiled
+        rm -rf ~/.julia/logs
+        rm -rf *.json
+        rm -rf _work/_temp
+        find . -type f -name "*.json" -delete
+        echo "✅ Workspace cleaned"
+        
     - name: Setup Julia
       uses: julia-actions/setup-julia@v1
       with:
         version: '1.10'
         
-    - name: Cache Julia packages
+    - name: Clear Julia depot cache
+      run: |
+        echo "🧹 Clearing Julia depot..."
+        julia -e 'using Pkg; Pkg.gc()'
+        echo "✅ Julia depot cleared"
+        
+    - name: Cache Julia packages (fresh)
       uses: actions/cache@v3
       with:
         path: ~/.julia
-        key: ${{ runner.os }}-julia-${{ hashFiles('**/Project.toml') }}
+        key: ${{ runner.os }}-julia-v2-${{ hashFiles('**/Project.toml') }}-${{ github.run_id }}
         restore-keys: |
-          ${{ runner.os }}-julia-
+          ${{ runner.os }}-julia-v2-${{ hashFiles('**/Project.toml') }}
           
     - name: Install dependencies
       run: |
-        julia --project=. -e 'using Pkg; Pkg.instantiate()'
+        echo "📦 Installing dependencies..."
+        julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+        echo "✅ Dependencies installed"
+        
+    - name: Verify clean state
+      run: |
+        echo "🔍 Verifying clean state..."
+        ls -la
+        echo "No old JSON files:"
+        find . -name "*.json" -type f || echo "None found (good!)"
         
     - name: Run holy grail experiments
       run: |
+        echo "🌌 Starting holy grail experiments..."
         julia --project=. holy_grail_experiments.jl
+        echo "✅ Experiments completed"
+        
+    - name: List generated files
+      if: always()
+      run: |
+        echo "📁 Generated files:"
+        ls -lh *.json 2>/dev/null || echo "No JSON files found"
         
     - name: Upload experiment results
       uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: holy-grail-results
+        name: holy-grail-results-${{ github.run_id }}
         path: holy_grail_results_*.json
         retention-days: 30
+        if-no-files-found: warn
+        
+    - name: Clean up after experiments
+      if: always()
+      run: |
+        echo "🧹 Cleaning up experiment test..."
+        rm -f holy_grail_results_*.json
+        julia -e 'GC.gc(true)'
+        echo "✅ Cleanup complete"
 
   summary:
     name: Generate Test Summary
@@ -92,23 +180,68 @@ jobs:
     if: always()
     
     steps:
-    - name: Download all results
+    - name: Clean workspace
+      run: |
+        echo "🧹 Starting with clean workspace..."
+        rm -rf *
+        
+    - name: Download baseline results
       uses: actions/download-artifact@v3
-      
+      continue-on-error: true
+      with:
+        name: baseline-results-${{ github.run_id }}
+        path: baseline-results
+        
+    - name: Download holy grail results
+      uses: actions/download-artifact@v3
+      continue-on-error: true
+      with:
+        name: holy-grail-results-${{ github.run_id }}
+        path: holy-grail-results
+        
     - name: Display summary
       run: |
         echo "## 🚀 HOLOLIFEX6 Test Results" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Run ID:** ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
         
         if [ -d "baseline-results" ]; then
           echo "### ✅ Baseline Test Completed" >> $GITHUB_STEP_SUMMARY
-          echo "Results saved in artifacts" >> $GITHUB_STEP_SUMMARY
-        fi
-        
-        if [ -d "holy-grail-results" ]; then
-          echo "### 🌌 Holy Grail Experiments Completed" >> $GITHUB_STEP_SUMMARY
-          echo "Results saved in artifacts" >> $GITHUB_STEP_SUMMARY
+          BASELINE_COUNT=$(find baseline-results -name "*.json" -type f | wc -l)
+          echo "- Files generated: $BASELINE_COUNT" >> $GITHUB_STEP_SUMMARY
+          if [ $BASELINE_COUNT -gt 0 ]; then
+            echo "- Status: SUCCESS ✅" >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          echo "### ❌ Baseline Test Failed" >> $GITHUB_STEP_SUMMARY
+          echo "- No results found" >> $GITHUB_STEP_SUMMARY
         fi
         
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "📊 Download artifacts to view detailed JSON results" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -d "holy-grail-results" ]; then
+          echo "### 🌌 Holy Grail Experiments Completed" >> $GITHUB_STEP_SUMMARY
+          GRAIL_COUNT=$(find holy-grail-results -name "*.json" -type f | wc -l)
+          echo "- Files generated: $GRAIL_COUNT" >> $GITHUB_STEP_SUMMARY
+          if [ $GRAIL_COUNT -gt 0 ]; then
+            echo "- Status: SUCCESS ✅" >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          echo "### ❌ Holy Grail Experiments Failed" >> $GITHUB_STEP_SUMMARY
+          echo "- No results found" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "---" >> $GITHUB_STEP_SUMMARY
+        echo "📊 **Download artifacts to view detailed JSON results**" >> $GITHUB_STEP_SUMMARY
+        echo "🧹 **All builds run with clean workspace (no corruption)**" >> $GITHUB_STEP_SUMMARY
+        
+    - name: Final cleanup
+      if: always()
+      run: |
+        echo "🧹 Final cleanup..."
+        rm -rf baseline-results
+        rm -rf holy-grail-results
+        echo "✅ All clean!"
