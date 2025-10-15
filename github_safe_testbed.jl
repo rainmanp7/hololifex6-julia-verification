@@ -423,7 +423,7 @@ function main()
             println("     - Learning: $(round(get(result, "learning_velocity", 0), digits=4))")
             
             if haskey(result, "scaling_efficiency")
-                println("   Scaling: $(result["scaling_class"]) ($(round(result["scaling_efficiency"], digits=1, sigdigits=3))%)")
+                println("   Scaling: $(result["scaling_class"]) ($(round(result["scaling_efficiency"], digits=1))%)")
             end
             println("   Status: $(result["status"])")
             println()
