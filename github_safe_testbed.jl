@@ -342,7 +342,7 @@ end
 function run_scaling_sweep(tester::SafeTester)::Vector{Dict{String,Any}}
     log_message(tester, "🧪 TEST 3: Progressive scaling sweep 16 → 1024 entities")
     
-    entity_counts = [16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072]
+    entity_counts = [16, 32, 64, 128, 256, 512, 1024]
     sweep_results = Dict{String,Any}[]
     
     for entity_count in entity_counts
