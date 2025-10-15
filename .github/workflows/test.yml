@@ -1,0 +1,114 @@
+name: HOLOLIFEX6 Julia Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  baseline-test:
+    name: Baseline 1024 Entity Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Julia
+      uses: julia-actions/setup-julia@v1
+      with:
+        version: '1.10'
+        
+    - name: Cache Julia packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.julia
+        key: ${{ runner.os }}-julia-${{ hashFiles('**/Project.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-julia-
+          
+    - name: Install dependencies
+      run: |
+        julia --project=. -e 'using Pkg; Pkg.instantiate()'
+        
+    - name: Run baseline scaling test
+      run: |
+        julia --project=. github_safe_testbed.jl
+        
+    - name: Upload baseline results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: baseline-results
+        path: scaling_results_*.json
+        retention-days: 30
+
+  holy-grail-test:
+    name: Holy Grail Experiments
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: baseline-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Julia
+      uses: julia-actions/setup-julia@v1
+      with:
+        version: '1.10'
+        
+    - name: Cache Julia packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.julia
+        key: ${{ runner.os }}-julia-${{ hashFiles('**/Project.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-julia-
+          
+    - name: Install dependencies
+      run: |
+        julia --project=. -e 'using Pkg; Pkg.instantiate()'
+        
+    - name: Run holy grail experiments
+      run: |
+        julia --project=. holy_grail_experiments.jl
+        
+    - name: Upload experiment results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: holy-grail-results
+        path: holy_grail_results_*.json
+        retention-days: 30
+
+  summary:
+    name: Generate Test Summary
+    runs-on: ubuntu-latest
+    needs: [baseline-test, holy-grail-test]
+    if: always()
+    
+    steps:
+    - name: Download all results
+      uses: actions/download-artifact@v3
+      
+    - name: Display summary
+      run: |
+        echo "## 🚀 HOLOLIFEX6 Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -d "baseline-results" ]; then
+          echo "### ✅ Baseline Test Completed" >> $GITHUB_STEP_SUMMARY
+          echo "Results saved in artifacts" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        if [ -d "holy-grail-results" ]; then
+          echo "### 🌌 Holy Grail Experiments Completed" >> $GITHUB_STEP_SUMMARY
+          echo "Results saved in artifacts" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📊 Download artifacts to view detailed JSON results" >> $GITHUB_STEP_SUMMARY
