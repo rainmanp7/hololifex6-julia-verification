@@ -30,7 +30,7 @@ jobs:
         echo "✅ Workspace cleaned"
         
     - name: Setup Julia
-      uses: julia-actions/setup-julia@v1
+      uses: julia-actions/setup-julia@v2
       with:
         version: '1.10'
         
@@ -41,7 +41,7 @@ jobs:
         echo "✅ Julia depot cleared"
         
     - name: Cache Julia packages (fresh)
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.julia
         key: ${{ runner.os }}-julia-v2-${{ hashFiles('**/Project.toml') }}-${{ github.run_id }}
@@ -74,13 +74,14 @@ jobs:
         ls -lh *.json 2>/dev/null || echo "No JSON files found"
         
     - name: Upload baseline results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: baseline-results-${{ github.run_id }}
         path: scaling_results_*.json
         retention-days: 30
         if-no-files-found: warn
+        compression-level: 6
         
     - name: Clean up after baseline
       if: always()
@@ -113,7 +114,7 @@ jobs:
         echo "✅ Workspace cleaned"
         
     - name: Setup Julia
-      uses: julia-actions/setup-julia@v1
+      uses: julia-actions/setup-julia@v2
       with:
         version: '1.10'
         
@@ -124,7 +125,7 @@ jobs:
         echo "✅ Julia depot cleared"
         
     - name: Cache Julia packages (fresh)
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.julia
         key: ${{ runner.os }}-julia-v2-${{ hashFiles('**/Project.toml') }}-${{ github.run_id }}
@@ -157,13 +158,14 @@ jobs:
         ls -lh *.json 2>/dev/null || echo "No JSON files found"
         
     - name: Upload experiment results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: holy-grail-results-${{ github.run_id }}
         path: holy_grail_results_*.json
         retention-days: 30
         if-no-files-found: warn
+        compression-level: 6
         
     - name: Clean up after experiments
       if: always()
@@ -186,14 +188,14 @@ jobs:
         rm -rf *
         
     - name: Download baseline results
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       continue-on-error: true
       with:
         name: baseline-results-${{ github.run_id }}
         path: baseline-results
         
     - name: Download holy grail results
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       continue-on-error: true
       with:
         name: holy-grail-results-${{ github.run_id }}
@@ -205,14 +207,16 @@ jobs:
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "**Run ID:** ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
         echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         
         if [ -d "baseline-results" ]; then
           echo "### ✅ Baseline Test Completed" >> $GITHUB_STEP_SUMMARY
-          BASELINE_COUNT=$(find baseline-results -name "*.json" -type f | wc -l)
+          BASELINE_COUNT=$(find baseline-results -name "*.json" -type f 2>/dev/null | wc -l)
           echo "- Files generated: $BASELINE_COUNT" >> $GITHUB_STEP_SUMMARY
           if [ $BASELINE_COUNT -gt 0 ]; then
             echo "- Status: SUCCESS ✅" >> $GITHUB_STEP_SUMMARY
+            echo "- Target: 16 → 1024 entities" >> $GITHUB_STEP_SUMMARY
           fi
         else
           echo "### ❌ Baseline Test Failed" >> $GITHUB_STEP_SUMMARY
@@ -223,10 +227,11 @@ jobs:
         
         if [ -d "holy-grail-results" ]; then
           echo "### 🌌 Holy Grail Experiments Completed" >> $GITHUB_STEP_SUMMARY
-          GRAIL_COUNT=$(find holy-grail-results -name "*.json" -type f | wc -l)
+          GRAIL_COUNT=$(find holy-grail-results -name "*.json" -type f 2>/dev/null | wc -l)
           echo "- Files generated: $GRAIL_COUNT" >> $GITHUB_STEP_SUMMARY
           if [ $GRAIL_COUNT -gt 0 ]; then
             echo "- Status: SUCCESS ✅" >> $GITHUB_STEP_SUMMARY
+            echo "- Experiments: Constant-time, Quantum, Holographic" >> $GITHUB_STEP_SUMMARY
           fi
         else
           echo "### ❌ Holy Grail Experiments Failed" >> $GITHUB_STEP_SUMMARY
@@ -237,6 +242,7 @@ jobs:
         echo "---" >> $GITHUB_STEP_SUMMARY
         echo "📊 **Download artifacts to view detailed JSON results**" >> $GITHUB_STEP_SUMMARY
         echo "🧹 **All builds run with clean workspace (no corruption)**" >> $GITHUB_STEP_SUMMARY
+        echo "⚡ **Using v4 artifact actions (98% faster uploads)**" >> $GITHUB_STEP_SUMMARY
         
     - name: Final cleanup
       if: always()
