@@ -44,14 +44,25 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.julia
-        key: ${{ runner.os }}-julia-v2-${{ hashFiles('**/Project.toml') }}-${{ github.run_id }}
+        key: ${{ runner.os }}-julia-v3-${{ hashFiles('**/Project.toml') }}-${{ github.run_id }}
         restore-keys: |
-          ${{ runner.os }}-julia-v2-${{ hashFiles('**/Project.toml') }}
+          ${{ runner.os }}-julia-v3-${{ hashFiles('**/Project.toml') }}
           
     - name: Install dependencies
       run: |
         echo "📦 Installing dependencies..."
-        julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+        julia --project=. -e '
+          using Pkg
+          Pkg.activate(".")
+          println("Adding JSON package...")
+          Pkg.add("JSON")
+          println("Running instantiate...")
+          Pkg.instantiate()
+          println("Precompiling...")
+          Pkg.precompile()
+          println("Package status:")
+          Pkg.status()
+        '
         echo "✅ Dependencies installed"
         
     - name: Verify clean state
@@ -128,14 +139,25 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.julia
-        key: ${{ runner.os }}-julia-v2-${{ hashFiles('**/Project.toml') }}-${{ github.run_id }}
+        key: ${{ runner.os }}-julia-v3-${{ hashFiles('**/Project.toml') }}-${{ github.run_id }}
         restore-keys: |
-          ${{ runner.os }}-julia-v2-${{ hashFiles('**/Project.toml') }}
+          ${{ runner.os }}-julia-v3-${{ hashFiles('**/Project.toml') }}
           
     - name: Install dependencies
       run: |
         echo "📦 Installing dependencies..."
-        julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+        julia --project=. -e '
+          using Pkg
+          Pkg.activate(".")
+          println("Adding JSON package...")
+          Pkg.add("JSON")
+          println("Running instantiate...")
+          Pkg.instantiate()
+          println("Precompiling...")
+          Pkg.precompile()
+          println("Package status:")
+          Pkg.status()
+        '
         echo "✅ Dependencies installed"
         
     - name: Verify clean state
