@@ -3,6 +3,7 @@
 🌌 HOLOLIFEX6 PROTOTYPE3 - HOLY GRAIL SCALING EXPERIMENTS
 Testing constant-time, negative scaling, and quantum emergence
 Julia implementation with optimized performance
+NOW WITH PROGRESSIVE SCALING 16 → 1024 ENTITIES
 """
 
 using Statistics
@@ -586,30 +587,60 @@ function test_holographic_compression(exp::HolyGrailExperiments, entity_count::I
 end
 
 function run_all_experiments(exp::HolyGrailExperiments)::Vector{Dict{String,Any}}
-    log_message(exp, "STARTING HOLY GRAIL EXPERIMENTS WITH INTELLIGENCE TRACKING")
+    log_message(exp, "STARTING SCALING HOLY GRAIL EXPERIMENTS 16 → 1024 ENTITIES")
     
-    experiments = [
-        (test_constant_time_scaling, 256),
-        (test_quantum_superposition, 128),
-        (test_holographic_compression, 512)
-    ]
+    # Progressive scaling levels for credible academic progression
+    scaling_levels = [16, 32, 64, 128, 256, 512, 1024]
     
-    for (experiment_func, entity_count) in experiments
+    # 1. Constant-time scaling progression
+    log_message(exp, "🔬 PHASE 1: CONSTANT-TIME SCALING PROGRESSION")
+    for entity_count in scaling_levels
+        log_message(exp, "   Testing constant-time with $entity_count entities")
         try
-            result = experiment_func(exp, entity_count)
-            if result["status"] == "memory_limited"
-                log_message(exp, "Experiment limited by memory - reducing scale")
-                smaller_count = entity_count ÷ 2
-                if smaller_count >= 64
-                    experiment_func(exp, smaller_count)
-                end
+            result = test_constant_time_scaling(exp, entity_count)
+            if result["status"] != "completed"
+                log_message(exp, "   ⚠️  Stopping constant-time at $entity_count entities")
+                break
             end
         catch e
-            log_message(exp, "Experiment failed: $e")
-            continue
+            log_message(exp, "   💥 Constant-time failed at $entity_count: $e")
+            break
         end
     end
     
+    # 2. Quantum superposition progression  
+    log_message(exp, "🔬 PHASE 2: QUANTUM SUPERPOSITION PROGRESSION")
+    for entity_count in scaling_levels
+        log_message(exp, "   Testing quantum superposition with $entity_count entities")
+        try
+            result = test_quantum_superposition(exp, entity_count)
+            if result["status"] != "completed"
+                log_message(exp, "   ⚠️  Stopping quantum at $entity_count entities")
+                break
+            end
+        catch e
+            log_message(exp, "   💥 Quantum failed at $entity_count: $e")
+            break
+        end
+    end
+    
+    # 3. Holographic compression progression
+    log_message(exp, "🔬 PHASE 3: HOLOGRAPHIC COMPRESSION PROGRESSION")
+    for entity_count in scaling_levels
+        log_message(exp, "   Testing holographic compression with $entity_count entities")
+        try
+            result = test_holographic_compression(exp, entity_count)
+            if result["status"] != "completed"
+                log_message(exp, "   ⚠️  Stopping holographic at $entity_count entities")
+                break
+            end
+        catch e
+            log_message(exp, "   💥 Holographic failed at $entity_count: $e")
+            break
+        end
+    end
+    
+    log_message(exp, "🎉 ALL SCALING EXPERIMENTS COMPLETED")
     return exp.results
 end
 
@@ -626,11 +657,12 @@ function save_results(exp::HolyGrailExperiments)::String
 end
 
 function main()
-    println("🌌 HOLOLIFEX6 PROTOTYPE3 - HOLY GRAIL EXPERIMENTS")
+    println("🌌 HOLOLIFEX6 PROTOTYPE3 - HOLY GRAIL SCALING EXPERIMENTS")
     println("="^60)
-    println("⚠️  WARNING: Experimental - may exceed GitHub memory limits")
-    println("🎯 TRACKING: Memory scaling + Intelligence metrics")
-    println("💎 Julia implementation with bug fixes")
+    println("🎯 PROGRESSIVE SCALING: 16 → 1024 entities per architecture")
+    println("🔬 TESTING: Constant-time + Quantum + Holographic approaches") 
+    println("📊 TRACKING: Memory scaling + Intelligence metrics + Coherence")
+    println("💎 Julia implementation with enhanced analysis")
     println("="^60)
     
     experimenter = HolyGrailExperiments()
@@ -640,30 +672,77 @@ function main()
         
         results_file = save_results(experimenter)
         
-        println("\n📊 HOLY GRAIL EXPERIMENTS SUMMARY:")
-        println("="^50)
-        for result in results
-            println("🌌 $(result["experiment"]):")
-            println("   Entities: $(result["entity_count"])")
-            println("   Memory: $(round(result["avg_memory_mb"], digits=1))MB")
-            println("   Step Time: $(round(result["avg_step_time_ms"], digits=1))ms")
-            println("   Coherence: $(round(result["final_coherence"], digits=3))")
-            println("   Intelligence Metrics:")
-            println("     - Complexity: $(round(get(result, "avg_complexity", 0), digits=2))")
-            println("     - Insight Rate: $(round(get(result, "insight_rate", 0), digits=2))/cycle")
-            println("     - Domain Variety: $(round(get(result, "domain_variety", 0), digits=3))")
-            println("     - Learning Trend: $(round(get(result, "learning_trend", 0), digits=3))")
-            if haskey(result, "avg_superposition_ratio")
-                println("   Superposition: $(round(result["avg_superposition_ratio"], digits=3))")
+        println("\n📊 HOLY GRAIL SCALING EXPERIMENTS SUMMARY:")
+        println("="^55)
+
+        # Group results by experiment type for better analysis
+        experiment_types = unique([r["experiment"] for r in results])
+        scaling_levels = [16, 32, 64, 128, 256, 512, 1024]
+
+        for exp_type in experiment_types
+            println("\n🌌 $(uppercase(exp_type)) SCALING:")
+            println("-" ^ 30)
+            
+            exp_results = filter(r -> r["experiment"] == exp_type, results)
+            sorted_results = sort(exp_results, by=x -> x["entity_count"])
+            
+            for result in sorted_results
+                entity_count = result["entity_count"]
+                memory = round(result["avg_memory_mb"], digits=1)
+                coherence = round(result["final_coherence"], digits=3)
+                complexity = round(get(result, "avg_complexity", 0), digits=2)
+                insight_rate = round(get(result, "insight_rate", 0), digits=2)
+                
+                scaling_ratio = entity_count / 16
+                scaling_info = "($(scaling_ratio)x)"
+                
+                println("   Entities: $(lpad(entity_count, 5)) $scaling_info")
+                println("   Memory: $(lpad(memory, 6))MB | Coherence: $coherence")
+                println("   Complexity: $complexity | Insight Rate: $insight_rate/cycle")
+                
+                # Show architecture-specific metrics
+                if exp_type == "quantum_superposition" && haskey(result, "avg_superposition_ratio")
+                    super_ratio = round(result["avg_superposition_ratio"], digits=3)
+                    println("   Superposition: $super_ratio | Entropy: $(round(get(result, "quantum_entropy", 0), digits=3))")
+                elseif exp_type == "constant_time_scaling" && haskey(result, "clusters")
+                    println("   Clusters: $(result["clusters"]) | Representatives: $(get(result, "representatives", 0))")
+                elseif exp_type == "holographic_compression" && haskey(result, "compression_active")
+                    println("   Compression: $(result["compression_active"]) | Ratio: $(get(result, "compression_ratio", 0))")
+                end
+                
+                println("   Status: $(result["status"])")
+                println()
             end
-            if haskey(result, "compression_active")
-                println("   Compression: $(result["compression_active"])")
+        end
+
+        # Calculate scaling efficiency for each architecture
+        println("\n📈 SCALING EFFICIENCY ANALYSIS:")
+        println("-" ^ 35)
+
+        for exp_type in experiment_types
+            exp_results = filter(r -> r["experiment"] == exp_type, results)
+            if length(exp_results) >= 2
+                baseline = exp_results[1]  # 16 entities
+                max_scale = exp_results[end]  # largest completed test
+                
+                baseline_memory = baseline["avg_memory_mb"]
+                max_memory = max_scale["avg_memory_mb"]
+                scale_ratio = max_scale["entity_count"] / baseline["entity_count"]
+                
+                expected_linear_memory = baseline_memory * scale_ratio
+                actual_memory = max_memory
+                efficiency = (expected_linear_memory - actual_memory) / expected_linear_memory * 100
+                
+                println("🌌 $(uppercase(exp_type)):")
+                println("   Scale: $(baseline["entity_count"]) → $(max_scale["entity_count"]) entities ($(round(scale_ratio, digits=1))x)")
+                println("   Memory: $(round(baseline_memory, digits=1))MB → $(round(actual_memory, digits=1))MB")
+                println("   Efficiency: $(round(efficiency, digits=1))% $(efficiency > 20 ? "🚀" : "✅")")
+                println("   Coherence: $(round(baseline["final_coherence"], digits=3)) → $(round(max_scale["final_coherence"], digits=3))")
+                println()
             end
-            println("   Status: $(result["status"])")
-            println()
         end
         
-        println("🌠 Holy Grail experiments completed!")
+        println("🌠 Holy Grail scaling experiments completed!")
         println("📁 Results saved to: $results_file")
         
     catch e
