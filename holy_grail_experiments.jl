@@ -769,6 +769,9 @@ function run_all_experiments(exp::HolyGrailExperiments)::Vector{Dict{String,Any}
         (test_many_worlds_validation, 1024),
         (test_many_worlds_validation, 51200),
         (test_many_worlds_validation, 358400)
+(test_many_worlds_validation, 658400)
+(test_many_worlds_validation, 1258400)
+(test_many_worlds_validation, 7858400)
     ]
     
     for (experiment_func, entity_count) in experiments
@@ -815,12 +818,15 @@ function main()
     println("   Phase 1: Constant-Time Scaling (256 entities)")
     println("   Phase 2: Quantum Superposition (128 entities)")
     println("   Phase 3: Holographic Compression (512 entities)")
-    println("   Phase 4: Many-Worlds Validation (5 scales)")
+    println("   Phase 4: Many-Worlds Validation (8 scales)")
     println("     → 256 entities")
     println("     → 512 entities")
     println("     → 1,024 entities")
     println("     → 51,200 entities")
     println("     → 358,400 entities")
+println("     → 658,400 entities")
+println("     → 1,258,400 entities")
+println("     → 7,858,400 entities")
     println()
     println("🔬 Many-Worlds Test Observables:")
     println("   - Spontaneous branching events")
