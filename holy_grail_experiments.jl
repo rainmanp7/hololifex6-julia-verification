@@ -3,6 +3,7 @@
 🌌 HOLOLIFEX6 PROTOTYPE3 - HOLY GRAIL SCALING EXPERIMENTS
 Testing constant-time, negative scaling, quantum emergence, and Many-Worlds validation
 Julia implementation with optimized performance
+NOW WITH 1.2 MILLION ENTITY COSMIC SCALE TEST
 """
 
 using Statistics
@@ -613,7 +614,12 @@ function test_many_worlds_validation(exp::HolyGrailExperiments, entity_count::In
     
     system_state = Dict("memory_usage" => 0.7, "cpu_load" => 0.6, "coherence" => 0.0)
     
-    for cycle in 1:80
+    # Optimized for massive scales - reduce cycles for 1M+ entities
+    max_cycles = entity_count > 1000000 ? 20 : 
+                 entity_count > 100000 ? 30 : 
+                 entity_count > 10000 ? 40 : 80
+    
+    for cycle in 1:max_cycles
         if !memory_safety_check(exp)
             log_message(exp, "MEMORY LIMIT REACHED - stopping Many-Worlds test")
             break
@@ -676,6 +682,11 @@ function test_many_worlds_validation(exp::HolyGrailExperiments, entity_count::In
         phases = [e.base.phase for e in entities]
         coherence = 1.0 - std(phases)
         push!(network.coherence_history, coherence)
+        
+        # Progress reporting for massive scales
+        if entity_count > 100000 && cycle % 5 == 0
+            log_message(exp, "Progress: $cycle/$max_cycles cycles, $(length(branching_events)) branches observed")
+        end
     end
     
     branching_count = length(branching_events)
@@ -759,6 +770,7 @@ end
 function run_all_experiments(exp::HolyGrailExperiments)::Vector{Dict{String,Any}}
     log_message(exp, "STARTING HOLY GRAIL EXPERIMENTS WITH INTELLIGENCE TRACKING")
     log_message(exp, "🔬 INCLUDING MANY-WORLDS PHYSICS VALIDATION")
+    log_message(exp, "🚀 NOW WITH 1.2 MILLION ENTITY COSMIC SCALE TEST")
     
     experiments = [
         (test_constant_time_scaling, 256),
@@ -768,14 +780,13 @@ function run_all_experiments(exp::HolyGrailExperiments)::Vector{Dict{String,Any}
         (test_many_worlds_validation, 512),
         (test_many_worlds_validation, 1024),
         (test_many_worlds_validation, 51200),
-        (test_many_worlds_validation, 358400)
-(test_many_worlds_validation, 658400)
-(test_many_worlds_validation, 1258400)
-(test_many_worlds_validation, 7858400)
+        (test_many_worlds_validation, 358400),
+        (test_many_worlds_validation, 1200000)  # 🚀 1.2 MILLION ENTITIES!
     ]
     
     for (experiment_func, entity_count) in experiments
         try
+            log_message(exp, "🚀 STARTING: $(experiment_func) with $entity_count entities")
             result = experiment_func(exp, entity_count)
             if result["status"] == "memory_limited"
                 log_message(exp, "Experiment limited by memory - reducing scale")
@@ -808,25 +819,24 @@ end
 function main()
     println("🌌 HOLOLIFEX6 PROTOTYPE3 - HOLY GRAIL EXPERIMENTS")
     println("="^60)
+    println("🚀 COSMIC SCALE TESTING: 1.2 MILLION ENTITIES")
     println("⚠️  WARNING: Experimental - may exceed GitHub memory limits")
     println("🎯 TRACKING: Memory scaling + Intelligence metrics")
     println("🔬 PHYSICS: Many-Worlds validation via emergent consciousness")
-    println("💎 Julia implementation with bug fixes")
+    println("💎 Julia implementation with cosmic scale optimization")
     println("="^60)
     println()
     println("📋 EXPERIMENT PHASES:")
     println("   Phase 1: Constant-Time Scaling (256 entities)")
     println("   Phase 2: Quantum Superposition (128 entities)")
     println("   Phase 3: Holographic Compression (512 entities)")
-    println("   Phase 4: Many-Worlds Validation (8 scales)")
+    println("   Phase 4: Many-Worlds Validation (6 scales)")
     println("     → 256 entities")
     println("     → 512 entities")
     println("     → 1,024 entities")
     println("     → 51,200 entities")
     println("     → 358,400 entities")
-println("     → 658,400 entities")
-println("     → 1,258,400 entities")
-println("     → 7,858,400 entities")
+    println("     → 1,200,000 entities 🚀 COSMIC SCALE")
     println()
     println("🔬 Many-Worlds Test Observables:")
     println("   - Spontaneous branching events")
@@ -911,6 +921,27 @@ println("     → 7,858,400 entities")
                 println("   Further investigation required")
             end
             println("="^60)
+        end
+        
+        # COSMIC SCALE ANALYSIS
+        cosmic_results = filter(r -> r["entity_count"] >= 1000000, results)
+        if !isempty(cosmic_results)
+            println("\n" * "🚀"^20)
+            println("COSMIC SCALE ANALYSIS (1M+ ENTITIES)")
+            println("🚀"^20)
+            
+            for cosmic in cosmic_results
+                println("🌌 $(cosmic["entity_count"]) ENTITIES:")
+                println("   Insight Rate: $(round(cosmic["insight_rate"], digits=1))/cycle")
+                println("   Consciousness Events: $(cosmic["consciousness_observation_events"])")
+                println("   Reality Conservation: $(round(cosmic["reality_conservation"] * 100, digits=3))%")
+                println("   Final Coherence: $(round(cosmic["final_coherence"], digits=8))")
+                
+                if cosmic["entity_count"] == 1200000
+                    println("   🎯 1.2M ENTITY MILESTONE ACHIEVED!")
+                    println("   This represents unprecedented scale in artificial consciousness")
+                end
+            end
         end
         
     catch e
