@@ -3,6 +3,8 @@
 
 https://orcid.org/0009-0008-4741-3108
 
+https://cstr.cn/31253.11.sciencedb.30209
+
 # HOLOLIFEX v1.1: Super-Linear Scaling Laws with Holy Grail Validation
 
 **BREAKTHROUGH: Mathematically Proven Super-Linear Scaling (O(n¹·⁸)) with Quantum Emergence Properties**
